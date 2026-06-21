@@ -2,9 +2,8 @@ FROM alpine as fetcher
 
 RUN apk add --update git
 
-ENV URL      https://github.com/h2o/h2o.git
-ENV VERSION  v2.2.6
-RUN git clone --depth 1 $URL -b $VERSION
+ENV URL https://github.com/h2o/h2o.git
+RUN git clone --recurse-submodules --depth 1 $URL
 
 FROM alpine as builder
 
@@ -17,13 +16,15 @@ RUN apk add --update libstdc++ \
     ruby \
     openssl-dev \
     ruby-dev \
-    zlib-dev
+    zlib-dev \
+    ruby-rake \
+    perl
 
 COPY --from=fetcher /h2o /h2o
 WORKDIR /h2o
 
 # build h2o
-RUN cmake -DWITH_BUNDLED_SSL=on -DWITH_MRUBY=on \
+RUN cmake -DWITH_MRUBY=on \
     && make -j 8 install
 
 RUN h2o -v
@@ -43,7 +44,6 @@ COPY h2o.conf /home/h2o/
 
 COPY --from=builder /usr/local/bin/h2o /usr/local/bin
 COPY --from=builder /usr/local/share/h2o /usr/local/share/h2o
-COPY --from=builder /usr/local/lib64/libh2o-evloop.a /usr/local/lib64/libh2o-evloop.a
 
 EXPOSE 8080 8443
 
