@@ -29,7 +29,7 @@ RUN cmake -DWITH_BUNDLED_SSL=on -DWITH_MRUBY=on \
 RUN h2o -v
 
 FROM alpine
-LABEL  maintainer "Lars K.W. Gohlke <lkwg82@gmx.de>"
+LABEL  org.opencontainers.image.authors "Lars K.W. Gohlke <lkwg82@gmx.de>, Shawn Zivontsis <shawnz@shawnz.org>"
 
 # need for ocsp stapling
 RUN    apk add -U --no-cache openssl perl libstdc++
